@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gouldian Finch Manager - ระบบจัดการนกฟินซ์ 7 สี</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Kanit', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+
+  <!-- หน้า Login -->
+  <div id="login-section" class="flex items-center justify-center min-h-screen px-4">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200">
+      <div class="text-center mb-6">
+        <div class="inline-block p-4 bg-emerald-100 rounded-full mb-3 text-emerald-600 text-3xl">
+          🦜
+        </div>
+        <h1 class="text-2xl font-bold text-slate-800">Gouldian Finch Manager</h1>
+        <p class="text-slate-500 text-sm mt-1">ระบบบันทึกรับเข้า-ขายออก นกฟินซ์ 7 สี</p>
+      </div>
+      
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ใช้ (Username)</label>
+          <input type="text" id="username" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน (Password)</label>
+          <input type="password" id="password" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
+        </div>
+        <button type="submit" id="btn-login" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-lg shadow-emerald-600/30">
+          เข้าสู่ระบบ
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- หน้า Dashboard หลัก -->
+  <div id="main-section" class="hidden">
+    <!-- Navbar -->
+    <nav class="bg-emerald-700 text-white shadow-lg sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-2 font-bold text-lg">
+          <span>🦜</span>
+          <span>ฟินซ์ 7 สี Manager</span>
+        </div>
+        <div class="flex items-center gap-3 text-xs md:text-sm">
+          <span class="bg-emerald-800/60 px-3 py-1.5 rounded-full border border-emerald-500/30">
+            ผู้ใช้: <strong id="user-display"></strong> (<span id="role-display" class="text-yellow-300 font-bold"></span>)
+          </span>
+          <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition shadow">
+            ออกจากระบบ
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+      <!-- การ์ดสรุปยอด -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-slate-400 font-bold uppercase">ยอดขายรวมทั้งหมด</p>
+            <p class="text-2xl font-extrabold text-emerald-600 mt-1" id="stat-sales">0 ฿</p>
+          </div>
+          <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-xl"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-slate-400 font-bold uppercase">ต้นทุนรวม (เฉพาะรายการที่ขายแล้ว)</p>
+            <p class="text-2xl font-extrabold text-slate-600 mt-1" id="stat-cost">0 ฿</p>
+          </div>
+          <div class="p-3 bg-slate-100 text-slate-600 rounded-xl text-xl"><i class="fa-solid fa-receipt"></i></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-slate-400 font-bold uppercase">กำไรสุทธิทั้งหมด</p>
+            <p class="text-2xl font-extrabold text-amber-500 mt-1" id="stat-profit">0 ฿</p>
+          </div>
+          <div class="p-3 bg-amber-50 text-amber-500 rounded-xl text-xl"><i class="fa-solid fa-coins"></i></div>
+        </div>
+      </div>
+
+      <!-- ฟอร์มการใช้งาน -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- ฟอร์ม 1: บันทึกรับเข้า -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-3">
+            <i class="fa-solid fa-plus-circle text-emerald-600"></i> บันทึกรับเข้านกใหม่
+          </h2>
+          <form id="add-form" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสห่วง (Ring ID)</label>
+              <input type="text" id="add-ring" required placeholder="เช่น G-2026-01" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">เจ้าของ / ฟาร์มรับมา</label>
+              <input type="text" id="add-owner" required placeholder="เช่น ฟาร์ม A" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">ราคาทุน (บาท)</label>
+              <input type="number" id="add-cost" required placeholder="0" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </div>
+            <button type="submit" id="btn-add" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow">
+              บันทึกนกรับเข้า
+            </button>
+          </form>
+        </div>
+
+        <!-- ฟอร์ม 2: บันทึกการขาย -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-3">
+            <i class="fa-solid fa-cart-shopping text-blue-600"></i> บันทึกการขาย
+          </h2>
+          <form id="sell-form" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกรหัสห่วง (เฉพาะนกที่พร้อมขาย)</label>
+              <select id="sell-ring" required class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+                <option value="">-- เลือกรหัสห่วง --</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">ราคาขายจริง (บาท)</label>
+              <input type="number" id="sell-price" required placeholder="0" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">แนบรูปใบเสร็จ / สลิปโอนเงิน</label>
+              <input type="file" id="sell-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+            </div>
+            <button type="submit" id="btn-sell" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow">
+              ยืนยันการขาย
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- ตารางแสดงรายการทั้งหมด -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b flex justify-between items-center bg-slate-50">
+          <h3 class="font-bold text-slate-700 text-sm md:text-base">รายการนกทั้งหมด</h3>
+          <button onclick="loadData()" class="text-xs bg-white hover:bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-lg font-medium transition shadow-sm flex items-center gap-1">
+            <i class="fa-solid fa-arrows-rotate"></i> รีเฟรช
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-100 text-xs font-semibold uppercase text-slate-500 border-b">
+              <tr>
+                <th class="py-3 px-4">รหัสห่วง</th>
+                <th class="py-3 px-4">เจ้าของ</th>
+                <th class="py-3 px-4">ราคาทุน</th>
+                <th class="py-3 px-4">ราคาขาย</th>
+                <th class="py-3 px-4">สถานะ</th>
+                <th class="py-3 px-4">ใบเสร็จ</th>
+                <th class="py-3 px-4 text-center">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="table-body" class="divide-y divide-slate-100">
+              <tr><td colspan="7" class="text-center py-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // 🔴 นำ URL ที่ได้จาก Google Apps Script มาวางในเครื่องหมายอัญประกาศตรงนี้
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFJwLDUt8yAd5srH5MXWHkFAVzmo7_5hB5YmVoVkSqJpBYUElQwcTaPAr_EJf4BiGORA/exec";
+
+    let currentUser = null;
+    let birdData = [];
+
+    // 1. ตรวจสอบ Login
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-login');
+      btn.innerText = 'กำลังเข้าสู่ระบบ...';
+      btn.disabled = true;
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'login', username, password })
+        });
+        const result = await res.json();
+
+        if (result.status === 'success') {
+          currentUser = result;
+          document.getElementById('login-section').classList.add('hidden');
+          document.getElementById('main-section').classList.remove('hidden');
+          document.getElementById('user-display').innerText = result.username;
+          document.getElementById('role-display').innerText = result.role;
+          loadData();
+        } else {
+          alert(result.message);
+        }
+      } catch(err) {
+        alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+      } finally {
+        btn.innerText = 'เข้าสู่ระบบ';
+        btn.disabled = false;
+      }
+    });
+
+    // 2. โหลดข้อมูลนก
+    async function loadData() {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-400">กำลังอัปเดตข้อมูล...</td></tr>';
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getBirds`);
+        const result = await res.json();
+        if (result.status === 'success') {
+          birdData = result.birds;
+          renderTable();
+          renderDropdown();
+          calculateSummary();
+        }
+      } catch(err) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-red-400">โหลดข้อมูลไม่สำเร็จ</td></tr>';
+      }
+    }
+
+    // 3. วาดตาราง
+    function renderTable() {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+
+      if (birdData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-400">ยังไม่มีข้อมูลในระบบ</td></tr>';
+        return;
+      }
+
+      birdData.forEach(bird => {
+        const isSold = bird.status === 'ขายแล้ว';
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-bold text-slate-800">${bird.ringId}</td>
+          <td class="py-3 px-4">${bird.owner}</td>
+          <td class="py-3 px-4">${bird.costPrice.toLocaleString()} ฿</td>
+          <td class="py-3 px-4 font-semibold ${isSold ? 'text-emerald-600' : 'text-slate-400'}">${isSold ? bird.sellingPrice.toLocaleString() + ' ฿' : '-'}</td>
+          <td class="py-3 px-4">
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${isSold ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
+              ${bird.status}
+            </span>
+          </td>
+          <td class="py-3 px-4">
+            ${bird.receiptUrl ? `<a href="${bird.receiptUrl}" target="_blank" class="text-blue-600 hover:underline text-xs flex items-center gap-1"><i class="fa-solid fa-image"></i> ดูใบเสร็จ</a>` : '-'}
+          </td>
+          <td class="py-3 px-4 text-center">
+            ${currentUser.role === 'Admin' ? 
+              `<button onclick="deleteItem(${bird.rowIndex})" class="text-red-500 hover:text-red-700 text-xs font-bold px-2 py-1 bg-red-50 hover:bg-red-100 rounded-lg transition border border-red-200">ลบ</button>` : 
+              '<span class="text-xs text-slate-300">-</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 4. วาด Dropdown
+    function renderDropdown() {
+      const select = document.getElementById('sell-ring');
+      select.innerHTML = '<option value="">-- เลือกรหัสห่วง --</option>';
+
+      birdData.filter(b => b.status === 'พร้อมขาย').forEach(bird => {
+        const opt = document.createElement('option');
+        opt.value = bird.ringId;
+        opt.innerText = `${bird.ringId} (ทุน: ${bird.costPrice.toLocaleString()} ฿)`;
+        select.appendChild(opt);
+      });
+    }
+
+    // 5. คำนวณสรุปผล
+    function calculateSummary() {
+      let sales = 0;
+      let cost = 0;
+
+      birdData.filter(b => b.status === 'ขายแล้ว').forEach(b => {
+        sales += b.sellingPrice;
+        cost += b.costPrice;
+      });
+
+      document.getElementById('stat-sales').innerText = sales.toLocaleString() + ' ฿';
+      document.getElementById('stat-cost').innerText = cost.toLocaleString() + ' ฿';
+      document.getElementById('stat-profit').innerText = (sales - cost).toLocaleString() + ' ฿';
+    }
+
+    // 6. บันทึกรับเข้า
+    document.getElementById('add-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-add');
+      btn.innerText = 'กำลังบันทึก...';
+      btn.disabled = true;
+
+      const ringId = document.getElementById('add-ring').value;
+      const owner = document.getElementById('add-owner').value;
+      const costPrice = document.getElementById('add-cost').value;
+
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'addBird', ringId, owner, costPrice })
+      });
+
+      e.target.reset();
+      btn.innerText = 'บันทึกนกรับเข้า';
+      btn.disabled = false;
+      loadData();
+    });
+
+    // 7. บันทึกการขาย
+    document.getElementById('sell-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-sell');
+      btn.innerText = 'กำลังบันทึกการขาย...';
+      btn.disabled = true;
+
+      const ringId = document.getElementById('sell-ring').value;
+      const sellingPrice = document.getElementById('sell-price').value;
+      const fileInput = document.getElementById('sell-file');
+
+      let imageData = null;
+      if (fileInput.files.length > 0) {
+        imageData = await new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = e => resolve(e.target.result);
+          reader.readAsDataURL(fileInput.files[0]);
+        });
+      }
+
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'sellBird', ringId, sellingPrice, imageData })
+      });
+
+      e.target.reset();
+      btn.innerText = 'ยืนยันการขาย';
+      btn.disabled = false;
+      loadData();
+    });
+
+    // 8. ลบรายการ (Admin เท่านั้น)
+    async function deleteItem(rowIndex) {
+      if (confirm('คุณต้องการลบรายการนี้ใช่หรือไม่?')) {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'deleteBird', rowIndex, role: currentUser.role })
+        });
+        loadData();
+      }
+    }
+
+    function logout() {
+      location.reload();
+    }
+  </script>
+</body>
+</html>

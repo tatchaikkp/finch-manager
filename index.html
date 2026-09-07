@@ -7,9 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Kanit', sans-serif; }
-  </style>
+  <style> body { font-family: 'Kanit', sans-serif; } </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
 
@@ -17,23 +15,20 @@
   <div id="login-section" class="flex items-center justify-center min-h-screen px-4">
     <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200">
       <div class="text-center mb-6">
-        <div class="inline-block p-4 bg-emerald-100 rounded-full mb-3 text-emerald-600 text-3xl">
-          🦜
-        </div>
+        <div class="inline-block p-4 bg-emerald-100 rounded-full mb-3 text-emerald-600 text-3xl">🦜</div>
         <h1 class="text-2xl font-bold text-slate-800">Gouldian Finch Manager</h1>
-        <p class="text-slate-500 text-sm mt-1">ระบบบันทึกรับเข้า-ขายออก นกฟินซ์ 7 สี</p>
+        <p class="text-slate-500 text-sm mt-1">ระบบบันทึกรับเข้า-ขายออก พร้อมระบบ Log ผู้รับผิดชอบ</p>
       </div>
-      
       <form id="login-form" class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ใช้ (Username)</label>
-          <input type="text" id="username" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
+          <input type="text" id="username" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน (Password)</label>
-          <input type="password" id="password" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none transition">
+          <input type="password" id="password" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
         </div>
-        <button type="submit" id="btn-login" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-lg shadow-emerald-600/30">
+        <button type="submit" id="btn-login" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-emerald-600/30">
           เข้าสู่ระบบ
         </button>
       </form>
@@ -42,7 +37,6 @@
 
   <!-- หน้า Dashboard หลัก -->
   <div id="main-section" class="hidden">
-    <!-- Navbar -->
     <nav class="bg-emerald-700 text-white shadow-lg sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <div class="flex items-center gap-2 font-bold text-lg">
@@ -53,9 +47,7 @@
           <span class="bg-emerald-800/60 px-3 py-1.5 rounded-full border border-emerald-500/30">
             ผู้ใช้: <strong id="user-display"></strong> (<span id="role-display" class="text-yellow-300 font-bold"></span>)
           </span>
-          <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition shadow">
-            ออกจากระบบ
-          </button>
+          <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition shadow">ออกจากระบบ</button>
         </div>
       </div>
     </nav>
@@ -87,9 +79,8 @@
         </div>
       </div>
 
-      <!-- ฟอร์มการใช้งาน -->
+      <!-- ฟอร์มรับเข้า/ขายออก -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
         <!-- ฟอร์ม 1: บันทึกรับเข้า -->
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-3">
@@ -139,10 +130,9 @@
             </button>
           </form>
         </div>
-
       </div>
 
-      <!-- ตารางแสดงรายการทั้งหมด -->
+      <!-- ตารางแสดงรายการพร้อม Log ผู้บันทึก -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="p-4 border-b flex justify-between items-center bg-slate-50">
           <h3 class="font-bold text-slate-700 text-sm md:text-base">รายการนกทั้งหมด</h3>
@@ -160,11 +150,13 @@
                 <th class="py-3 px-4">ราคาขาย</th>
                 <th class="py-3 px-4">สถานะ</th>
                 <th class="py-3 px-4">ใบเสร็จ</th>
+                <th class="py-3 px-4">ผู้รับเข้า</th>
+                <th class="py-3 px-4">ผู้ขายออก</th>
                 <th class="py-3 px-4 text-center">จัดการ</th>
               </tr>
             </thead>
             <tbody id="table-body" class="divide-y divide-slate-100">
-              <tr><td colspan="7" class="text-center py-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+              <tr><td colspan="9" class="text-center py-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>
             </tbody>
           </table>
         </div>
@@ -174,13 +166,12 @@
   </div>
 
   <script>
-    // 🔴 นำ URL ที่ได้จาก Google Apps Script มาวางในเครื่องหมายอัญประกาศตรงนี้
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFJwLDUt8yAd5srH5MXWHkFAVzmo7_5hB5YmVoVkSqJpBYUElQwcTaPAr_EJf4BiGORA/exec";
+    // 🔴 ใส่ Web App URL ของคุณที่นี่
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJnXndZdP5x4deoc725WYHw5PRKMWWkRPfwT2K4M60CYs1hF1ONwIOw7HbkquweDvDyg/exec";
 
     let currentUser = null;
     let birdData = [];
 
-    // 1. ตรวจสอบ Login
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-login');
@@ -215,10 +206,9 @@
       }
     });
 
-    // 2. โหลดข้อมูลนก
     async function loadData() {
       const tbody = document.getElementById('table-body');
-      tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-400">กำลังอัปเดตข้อมูล...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center py-6 text-slate-400">กำลังอัปเดตข้อมูล...</td></tr>';
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=getBirds`);
@@ -230,17 +220,16 @@
           calculateSummary();
         }
       } catch(err) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-red-400">โหลดข้อมูลไม่สำเร็จ</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-6 text-red-400">โหลดข้อมูลไม่สำเร็จ</td></tr>';
       }
     }
 
-    // 3. วาดตาราง
     function renderTable() {
       const tbody = document.getElementById('table-body');
       tbody.innerHTML = '';
 
       if (birdData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-400">ยังไม่มีข้อมูลในระบบ</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-6 text-slate-400">ยังไม่มีข้อมูลในระบบ</td></tr>';
         return;
       }
 
@@ -259,8 +248,10 @@
             </span>
           </td>
           <td class="py-3 px-4">
-            ${bird.receiptUrl ? `<a href="${bird.receiptUrl}" target="_blank" class="text-blue-600 hover:underline text-xs flex items-center gap-1"><i class="fa-solid fa-image"></i> ดูใบเสร็จ</a>` : '-'}
+            ${bird.receiptUrl ? `<a href="${bird.receiptUrl}" target="_blank" class="text-blue-600 hover:underline text-xs flex items-center gap-1"><i class="fa-solid fa-image"></i> ใบเสร็จ</a>` : '-'}
           </td>
+          <td class="py-3 px-4 text-xs font-medium text-slate-500"><i class="fa-regular fa-user text-slate-400 mr-1"></i>${bird.addedBy}</td>
+          <td class="py-3 px-4 text-xs font-medium text-slate-500">${isSold ? `<i class="fa-regular fa-user text-slate-400 mr-1"></i>${bird.soldBy}` : '-'}</td>
           <td class="py-3 px-4 text-center">
             ${currentUser.role === 'Admin' ? 
               `<button onclick="deleteItem(${bird.rowIndex})" class="text-red-500 hover:text-red-700 text-xs font-bold px-2 py-1 bg-red-50 hover:bg-red-100 rounded-lg transition border border-red-200">ลบ</button>` : 
@@ -271,7 +262,6 @@
       });
     }
 
-    // 4. วาด Dropdown
     function renderDropdown() {
       const select = document.getElementById('sell-ring');
       select.innerHTML = '<option value="">-- เลือกรหัสห่วง --</option>';
@@ -284,7 +274,6 @@
       });
     }
 
-    // 5. คำนวณสรุปผล
     function calculateSummary() {
       let sales = 0;
       let cost = 0;
@@ -299,7 +288,7 @@
       document.getElementById('stat-profit').innerText = (sales - cost).toLocaleString() + ' ฿';
     }
 
-    // 6. บันทึกรับเข้า
+    // บันทึกรับเข้า (ส่ง username ไปลง Log)
     document.getElementById('add-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-add');
@@ -312,7 +301,13 @@
 
       await fetch(SCRIPT_URL, {
         method: 'POST',
-        body: JSON.stringify({ action: 'addBird', ringId, owner, costPrice })
+        body: JSON.stringify({ 
+          action: 'addBird', 
+          ringId, 
+          owner, 
+          costPrice, 
+          username: currentUser.username 
+        })
       });
 
       e.target.reset();
@@ -321,7 +316,7 @@
       loadData();
     });
 
-    // 7. บันทึกการขาย
+    // บันทึกการขาย (ส่ง username ไปลง Log)
     document.getElementById('sell-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-sell');
@@ -343,7 +338,13 @@
 
       await fetch(SCRIPT_URL, {
         method: 'POST',
-        body: JSON.stringify({ action: 'sellBird', ringId, sellingPrice, imageData })
+        body: JSON.stringify({ 
+          action: 'sellBird', 
+          ringId, 
+          sellingPrice, 
+          imageData, 
+          username: currentUser.username 
+        })
       });
 
       e.target.reset();
@@ -352,7 +353,6 @@
       loadData();
     });
 
-    // 8. ลบรายการ (Admin เท่านั้น)
     async function deleteItem(rowIndex) {
       if (confirm('คุณต้องการลบรายการนี้ใช่หรือไม่?')) {
         await fetch(SCRIPT_URL, {

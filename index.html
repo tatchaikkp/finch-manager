@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gouldian Finch Manager - ระบบจัดการนกฟินซ์ 7 สี</title>
+  <title>Gouldian Finch Manager - ระบบจัดการนกฟินซ์ & อาหารนก</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
       <div class="text-center mb-6">
         <div class="inline-block p-4 bg-emerald-100 rounded-full mb-3 text-emerald-600 text-3xl">🦜</div>
         <h1 class="text-2xl font-bold text-slate-800">Gouldian Finch Manager</h1>
-        <p class="text-slate-500 text-sm mt-1">ระบบบันทึกรับเข้า-ขายออก พร้อมระบบ Log ผู้รับผิดชอบ</p>
+        <p class="text-slate-500 text-sm mt-1">ระบบจัดการนกฟินซ์ 7 สี และคลังอาหารนก</p>
       </div>
       <form id="login-form" class="space-y-4">
         <div>
@@ -41,7 +41,7 @@
       <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <div class="flex items-center gap-2 font-bold text-lg">
           <span>🦜</span>
-          <span>ฟินซ์ 7 สี Manager</span>
+          <span class="hidden sm:inline">ฟินซ์ 7 สี & อาหารนก Manager</span>
         </div>
         <div class="flex items-center gap-3 text-xs md:text-sm">
           <span class="bg-emerald-800/60 px-3 py-1.5 rounded-full border border-emerald-500/30">
@@ -54,113 +54,252 @@
 
     <div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-      <!-- การ์ดสรุปยอด -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-          <div>
-            <p class="text-xs text-slate-400 font-bold uppercase">ยอดขายรวมทั้งหมด</p>
-            <p class="text-2xl font-extrabold text-emerald-600 mt-1" id="stat-sales">0 ฿</p>
+      <!-- แถบสลับเมนู (Tabs) -->
+      <div class="flex border-b border-slate-300 space-x-4">
+        <button id="tab-birds-btn" onclick="switchTab('birds')" class="pb-3 px-4 font-bold text-emerald-700 border-b-2 border-emerald-600 transition flex items-center gap-2">
+          <i class="fa-solid fa-dove"></i> จัดการนกฟินซ์
+        </button>
+        <button id="tab-food-btn" onclick="switchTab('food')" class="pb-3 px-4 font-semibold text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
+          <i class="fa-solid fa-wheat-awn"></i> คลังอาหารนก
+        </button>
+      </div>
+
+      <!-- TAB 1: ระบบจัดการนก -->
+      <div id="tab-birds" class="space-y-6">
+        <!-- การ์ดสรุปยอดนก -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-400 font-bold uppercase">ยอดขายรวมนก</p>
+              <p class="text-2xl font-extrabold text-emerald-600 mt-1" id="stat-sales">0 ฿</p>
+            </div>
+            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-xl"><i class="fa-solid fa-hand-holding-dollar"></i></div>
           </div>
-          <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-xl"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-400 font-bold uppercase">ต้นทุนรวม (นกขายแล้ว)</p>
+              <p class="text-2xl font-extrabold text-slate-600 mt-1" id="stat-cost">0 ฿</p>
+            </div>
+            <div class="p-3 bg-slate-100 text-slate-600 rounded-xl text-xl"><i class="fa-solid fa-receipt"></i></div>
+          </div>
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-400 font-bold uppercase">กำไรสุทธิการขายนก</p>
+              <p class="text-2xl font-extrabold text-amber-500 mt-1" id="stat-profit">0 ฿</p>
+            </div>
+            <div class="p-3 bg-amber-50 text-amber-500 rounded-xl text-xl"><i class="fa-solid fa-coins"></i></div>
+          </div>
         </div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-          <div>
-            <p class="text-xs text-slate-400 font-bold uppercase">ต้นทุนรวม (เฉพาะรายการที่ขายแล้ว)</p>
-            <p class="text-2xl font-extrabold text-slate-600 mt-1" id="stat-cost">0 ฿</p>
+
+        <!-- ฟอร์มรับเข้า/ขายออก -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div id="add-bird-card" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-3">
+              <i class="fa-solid fa-plus-circle text-emerald-600"></i> บันทึกรับเข้านกใหม่
+            </h2>
+            <form id="add-form" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสห่วง (Ring ID)</label>
+                <input type="text" id="add-ring" required placeholder="เช่น G-2026-01" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">เจ้าของ / ฟาร์มรับมา</label>
+                <input type="text" id="add-owner" required placeholder="เช่น ฟาร์ม A" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">ราคาทุน (บาท)</label>
+                <input type="number" id="add-cost" required placeholder="0" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              </div>
+              <button type="submit" id="btn-add" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow">
+                บันทึกนกรับเข้า
+              </button>
+            </form>
           </div>
-          <div class="p-3 bg-slate-100 text-slate-600 rounded-xl text-xl"><i class="fa-solid fa-receipt"></i></div>
+
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-3">
+              <i class="fa-solid fa-cart-shopping text-blue-600"></i> บันทึกการขาย
+            </h2>
+            <form id="sell-form" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกรหัสห่วง (เฉพาะนกที่พร้อมขาย)</label>
+                <select id="sell-ring" required class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+                  <option value="">-- เลือกรหัสห่วง --</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">ราคาขายจริง (บาท)</label>
+                <input type="number" id="sell-price" required placeholder="0" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">แนบรูปใบเสร็จ / สลิปโอนเงิน</label>
+                <input type="file" id="sell-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+              </div>
+              <button type="submit" id="btn-sell" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow">
+                ยืนยันการขาย
+              </button>
+            </form>
+          </div>
         </div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-          <div>
-            <p class="text-xs text-slate-400 font-bold uppercase">กำไรสุทธิทั้งหมด</p>
-            <p class="text-2xl font-extrabold text-amber-500 mt-1" id="stat-profit">0 ฿</p>
+
+        <!-- ตารางแสดงรายการนก -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b flex justify-between items-center bg-slate-50">
+            <h3 class="font-bold text-slate-700 text-sm md:text-base">รายการนกทั้งหมด</h3>
+            <button onclick="loadData()" class="text-xs bg-white hover:bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-lg font-medium transition shadow-sm flex items-center gap-1">
+              <i class="fa-solid fa-arrows-rotate"></i> รีเฟรช
+            </button>
           </div>
-          <div class="p-3 bg-amber-50 text-amber-500 rounded-xl text-xl"><i class="fa-solid fa-coins"></i></div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-100 text-xs font-semibold uppercase text-slate-500 border-b">
+                <tr>
+                  <th class="py-3 px-4">รหัสห่วง</th>
+                  <th class="py-3 px-4">เจ้าของ</th>
+                  <th class="py-3 px-4">ราคาทุน</th>
+                  <th class="py-3 px-4">ราคาขาย</th>
+                  <th class="py-3 px-4">สถานะ</th>
+                  <th class="py-3 px-4">ใบเสร็จ</th>
+                  <th class="py-3 px-4">ผู้รับเข้า</th>
+                  <th class="py-3 px-4">ผู้ขายออก</th>
+                  <th class="py-3 px-4 text-center">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="table-body" class="divide-y divide-slate-100">
+                <tr><td colspan="9" class="text-center py-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- ฟอร์มรับเข้า/ขายออก -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        <!-- ฟอร์ม 1: บันทึกรับเข้า (แสดงเฉพาะ Admin) -->
-        <div id="add-bird-card" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-3">
-            <i class="fa-solid fa-plus-circle text-emerald-600"></i> บันทึกรับเข้านกใหม่
-          </h2>
-          <form id="add-form" class="space-y-4">
+      <!-- TAB 2: คลังอาหารนก -->
+      <div id="tab-food" class="space-y-6 hidden">
+        <!-- การ์ดสรุปยอดขายอาหาร -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสห่วง (Ring ID)</label>
-              <input type="text" id="add-ring" required placeholder="เช่น G-2026-01" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <p class="text-xs text-slate-400 font-bold uppercase">ยอดขายอาหารรวม</p>
+              <p class="text-2xl font-extrabold text-emerald-600 mt-1" id="food-stat-sales">0 ฿</p>
             </div>
+            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-xl"><i class="fa-solid fa-sack-dollar"></i></div>
+          </div>
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">เจ้าของ / ฟาร์มรับมา</label>
-              <input type="text" id="add-owner" required placeholder="เช่น ฟาร์ม A" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <p class="text-xs text-slate-400 font-bold uppercase">กำไรสุทธิอาหารนก</p>
+              <p class="text-2xl font-extrabold text-amber-500 mt-1" id="food-stat-profit">0 ฿</p>
             </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">ราคาทุน (บาท)</label>
-              <input type="number" id="add-cost" required placeholder="0" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-            </div>
-            <button type="submit" id="btn-add" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow">
-              บันทึกนกรับเข้า
-            </button>
-          </form>
+            <div class="p-3 bg-amber-50 text-amber-500 rounded-xl text-xl"><i class="fa-solid fa-chart-line"></i></div>
+          </div>
         </div>
 
-        <!-- ฟอร์ม 2: บันทึกการขาย (เปิดให้ทุกคน) -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-3">
-            <i class="fa-solid fa-cart-shopping text-blue-600"></i> บันทึกการขาย
-          </h2>
-          <form id="sell-form" class="space-y-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกรหัสห่วง (เฉพาะนกที่พร้อมขาย)</label>
-              <select id="sell-ring" required class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
-                <option value="">-- เลือกรหัสห่วง --</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">ราคาขายจริง (บาท)</label>
-              <input type="number" id="sell-price" required placeholder="0" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">แนบรูปใบเสร็จ / สลิปโอนเงิน</label>
-              <input type="file" id="sell-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-            </div>
-            <button type="submit" id="btn-sell" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow">
-              ยืนยันการขาย
-            </button>
-          </form>
-        </div>
-      </div>
+        <!-- ฟอร์มอาหารนก -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- เพิ่มสต็อกอาหาร (Admin Only) -->
+          <div id="add-food-card" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-3">
+              <i class="fa-solid fa-boxes-packing text-amber-600"></i> เพิ่มสต็อกอาหารนก
+            </h2>
+            <form id="add-food-form" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อรายการอาหาร / ยี่ห้อ</label>
+                <input type="text" id="food-name" required placeholder="เช่น มิลเล็ตแดง 1 kg" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">ราคาทุน/หน่วย</label>
+                  <input type="number" id="food-cost" required placeholder="0" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">ราคาขาย/หน่วย</label>
+                  <input type="number" id="food-price" required placeholder="0" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">จำนวนที่เพิ่มเข้าสต็อก</label>
+                <input type="number" id="food-qty" required placeholder="1" min="1" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              </div>
+              <button type="submit" id="btn-add-food" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow">
+                บันทึกสต็อกอาหาร
+              </button>
+            </form>
+          </div>
 
-      <!-- ตารางแสดงรายการพร้อม Log ผู้บันทึก -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="p-4 border-b flex justify-between items-center bg-slate-50">
-          <h3 class="font-bold text-slate-700 text-sm md:text-base">รายการนกทั้งหมด</h3>
-          <button onclick="loadData()" class="text-xs bg-white hover:bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-lg font-medium transition shadow-sm flex items-center gap-1">
-            <i class="fa-solid fa-arrows-rotate"></i> รีเฟรช
-          </button>
+          <!-- บันทึกขายอาหาร -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-3">
+              <i class="fa-solid fa-basket-shopping text-emerald-600"></i> ขายอาหารนก (ตัดสต็อก)
+            </h2>
+            <form id="sell-food-form" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกรายการอาหาร</label>
+                <select id="sell-food-select" required onchange="updateFoodPriceHint()" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                  <option value="">-- เลือกรายการอาหาร --</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">จำนวนที่ขาย</label>
+                <input type="number" id="sell-food-qty" required placeholder="1" min="1" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              </div>
+              <p id="food-price-hint" class="text-xs text-slate-500 font-medium"></p>
+              <button type="submit" id="btn-sell-food" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow">
+                ยืนยันการขายอาหาร
+              </button>
+            </form>
+          </div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm text-slate-600">
-            <thead class="bg-slate-100 text-xs font-semibold uppercase text-slate-500 border-b">
-              <tr>
-                <th class="py-3 px-4">รหัสห่วง</th>
-                <th class="py-3 px-4">เจ้าของ</th>
-                <th class="py-3 px-4">ราคาทุน</th>
-                <th class="py-3 px-4">ราคาขาย</th>
-                <th class="py-3 px-4">สถานะ</th>
-                <th class="py-3 px-4">ใบเสร็จ</th>
-                <th class="py-3 px-4">ผู้รับเข้า</th>
-                <th class="py-3 px-4">ผู้ขายออก</th>
-                <th class="py-3 px-4 text-center">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="table-body" class="divide-y divide-slate-100">
-              <tr><td colspan="9" class="text-center py-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>
-            </tbody>
-          </table>
+
+        <!-- ตารางแสดงสต็อกอาหาร -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b flex justify-between items-center bg-slate-50">
+            <h3 class="font-bold text-slate-700 text-sm md:text-base">สต็อกอาหารนกปัจจุบัน</h3>
+            <button onclick="loadFoodData()" class="text-xs bg-white hover:bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-lg font-medium transition shadow-sm flex items-center gap-1">
+              <i class="fa-solid fa-arrows-rotate"></i> รีเฟรชสต็อก
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-100 text-xs font-semibold uppercase text-slate-500 border-b">
+                <tr>
+                  <th class="py-3 px-4">ชื่อรายการ</th>
+                  <th class="py-3 px-4">ราคาทุน</th>
+                  <th class="py-3 px-4">ราคาขาย</th>
+                  <th class="py-3 px-4">คงเหลือ</th>
+                  <th class="py-3 px-4">ผู้เพิ่มล่าสุด</th>
+                  <th class="py-3 px-4 text-center">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="food-table-body" class="divide-y divide-slate-100">
+                <tr><td colspan="6" class="text-center py-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        <!-- ตารางประวัติการขายอาหาร -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b bg-slate-50">
+            <h3 class="font-bold text-slate-700 text-sm md:text-base">ประวัติการขายอาหารนก</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-100 text-xs font-semibold uppercase text-slate-500 border-b">
+                <tr>
+                  <th class="py-3 px-4">วัน-เวลา</th>
+                  <th class="py-3 px-4">รายการ</th>
+                  <th class="py-3 px-4">จำนวน</th>
+                  <th class="py-3 px-4">ยอดขาย</th>
+                  <th class="py-3 px-4">กำไร</th>
+                  <th class="py-3 px-4">ผู้ขาย</th>
+                </tr>
+              </thead>
+              <tbody id="food-sales-table-body" class="divide-y divide-slate-100">
+                <tr><td colspan="6" class="text-center py-6 text-slate-400">ยังไม่มีประวัติการขาย</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -171,6 +310,7 @@
 
     let currentUser = null;
     let birdData = [];
+    let foodData = [];
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -195,15 +335,13 @@
           document.getElementById('user-display').innerText = result.username;
           document.getElementById('role-display').innerText = result.role;
 
-          // 🔴 เช็คซ่อน/แสดงการ์ดรับเข้านก (หากไม่ใช่ Admin จะถูกซ่อนไว้)
-          const addBirdCard = document.getElementById('add-bird-card');
-          if (currentUser.role !== 'Admin') {
-            addBirdCard.style.display = 'none';
-          } else {
-            addBirdCard.style.display = 'block';
-          }
+          // เช็คซ่อน/แสดงส่วนเพิ่มข้อมูลเฉพาะ Admin
+          const isAdmin = currentUser.role === 'Admin';
+          document.getElementById('add-bird-card').style.display = isAdmin ? 'block' : 'none';
+          document.getElementById('add-food-card').style.display = isAdmin ? 'block' : 'none';
 
           loadData();
+          loadFoodData();
         } else {
           alert(result.message);
         }
@@ -215,6 +353,27 @@
       }
     });
 
+    // ระบบสลับ Tap
+    function switchTab(tab) {
+      const birdTab = document.getElementById('tab-birds');
+      const foodTab = document.getElementById('tab-food');
+      const birdBtn = document.getElementById('tab-birds-btn');
+      const foodBtn = document.getElementById('tab-food-btn');
+
+      if (tab === 'birds') {
+        birdTab.classList.remove('hidden');
+        foodTab.classList.add('hidden');
+        birdBtn.className = "pb-3 px-4 font-bold text-emerald-700 border-b-2 border-emerald-600 transition flex items-center gap-2";
+        foodBtn.className = "pb-3 px-4 font-semibold text-slate-500 hover:text-slate-800 transition flex items-center gap-2";
+      } else {
+        birdTab.classList.add('hidden');
+        foodTab.classList.remove('hidden');
+        foodBtn.className = "pb-3 px-4 font-bold text-amber-600 border-b-2 border-amber-500 transition flex items-center gap-2";
+        birdBtn.className = "pb-3 px-4 font-semibold text-slate-500 hover:text-slate-800 transition flex items-center gap-2";
+      }
+    }
+
+    // --- ส่วนของข้อมูลนก ---
     async function loadData() {
       const tbody = document.getElementById('table-body');
       tbody.innerHTML = '<tr><td colspan="9" class="text-center py-6 text-slate-400">กำลังอัปเดตข้อมูล...</td></tr>';
@@ -297,31 +456,25 @@
       document.getElementById('stat-profit').innerText = (sales - cost).toLocaleString() + ' ฿';
     }
 
-    // บันทึกรับเข้า (ส่ง username และ role)
     document.getElementById('add-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-add');
       btn.innerText = 'กำลังบันทึก...';
       btn.disabled = true;
 
-      const ringId = document.getElementById('add-ring').value;
-      const owner = document.getElementById('add-owner').value;
-      const costPrice = document.getElementById('add-cost').value;
-
       try {
         const res = await fetch(SCRIPT_URL, {
           method: 'POST',
           body: JSON.stringify({ 
             action: 'addBird', 
-            ringId, 
-            owner, 
-            costPrice, 
+            ringId: document.getElementById('add-ring').value, 
+            owner: document.getElementById('add-owner').value, 
+            costPrice: document.getElementById('add-cost').value, 
             username: currentUser.username,
-            role: currentUser.role // 🔴 เพิ่มแนบ Role เพื่อตรวจเช็คสิทธิ์
+            role: currentUser.role
           })
         });
         const result = await res.json();
-        
         if (result.status === 'success') {
           e.target.reset();
           loadData();
@@ -336,17 +489,13 @@
       }
     });
 
-    // บันทึกการขาย (ส่ง username)
     document.getElementById('sell-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-sell');
       btn.innerText = 'กำลังบันทึกการขาย...';
       btn.disabled = true;
 
-      const ringId = document.getElementById('sell-ring').value;
-      const sellingPrice = document.getElementById('sell-price').value;
       const fileInput = document.getElementById('sell-file');
-
       let imageData = null;
       if (fileInput.files.length > 0) {
         imageData = await new Promise(resolve => {
@@ -361,14 +510,13 @@
           method: 'POST',
           body: JSON.stringify({ 
             action: 'sellBird', 
-            ringId, 
-            sellingPrice, 
+            ringId: document.getElementById('sell-ring').value, 
+            sellingPrice: document.getElementById('sell-price').value, 
             imageData, 
             username: currentUser.username 
           })
         });
         const result = await res.json();
-        
         if (result.status === 'success') {
           e.target.reset();
           loadData();
@@ -384,12 +532,198 @@
     });
 
     async function deleteItem(rowIndex) {
-      if (confirm('คุณต้องการลบรายการนี้ใช่หรือไม่?')) {
+      if (confirm('คุณต้องการลบรายการนกนี้ใช่หรือไม่?')) {
         await fetch(SCRIPT_URL, {
           method: 'POST',
           body: JSON.stringify({ action: 'deleteBird', rowIndex, role: currentUser.role })
         });
         loadData();
+      }
+    }
+
+    // --- ส่วนของข้อมูลอาหารนก ---
+    async function loadFoodData() {
+      const tbody = document.getElementById('food-table-body');
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400">กำลังอัปเดตสต็อก...</td></tr>';
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getFoodData`);
+        const result = await res.json();
+        if (result.status === 'success') {
+          foodData = result.foods;
+          renderFoodTable(result.foods);
+          renderFoodSalesTable(result.sales);
+          renderFoodSelect();
+          calculateFoodSummary(result.sales);
+        }
+      } catch(err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-red-400">โหลดข้อมูลอาหารไม่สำเร็จ</td></tr>';
+      }
+    }
+
+    function renderFoodTable(foods) {
+      const tbody = document.getElementById('food-table-body');
+      tbody.innerHTML = '';
+
+      if (foods.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400">ยังไม่มีสินค้าในสต็อก</td></tr>';
+        return;
+      }
+
+      foods.forEach(food => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-bold text-slate-800">${food.name}</td>
+          <td class="py-3 px-4">${food.costPrice.toLocaleString()} ฿</td>
+          <td class="py-3 px-4 font-semibold text-emerald-600">${food.sellingPrice.toLocaleString()} ฿</td>
+          <td class="py-3 px-4 font-bold ${food.qty < 5 ? 'text-red-500' : 'text-slate-700'}">${food.qty}</td>
+          <td class="py-3 px-4 text-xs font-medium text-slate-500">${food.addedBy}</td>
+          <td class="py-3 px-4 text-center">
+            ${currentUser.role === 'Admin' ? 
+              `<button onclick="deleteFoodStock(${food.rowIndex})" class="text-red-500 hover:text-red-700 text-xs font-bold px-2 py-1 bg-red-50 hover:bg-red-100 rounded-lg transition border border-red-200">ลบ</button>` : 
+              '<span class="text-xs text-slate-300">-</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderFoodSalesTable(sales) {
+      const tbody = document.getElementById('food-sales-table-body');
+      tbody.innerHTML = '';
+
+      if (sales.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400">ยังไม่มีประวัติการขาย</td></tr>';
+        return;
+      }
+
+      sales.slice().reverse().forEach(sale => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        tr.innerHTML = `
+          <td class="py-3 px-4 text-xs text-slate-500">${sale.timestamp}</td>
+          <td class="py-3 px-4 font-medium text-slate-800">${sale.name}</td>
+          <td class="py-3 px-4 font-semibold">${sale.qty}</td>
+          <td class="py-3 px-4 font-bold text-emerald-600">${sale.totalSales.toLocaleString()} ฿</td>
+          <td class="py-3 px-4 font-bold text-amber-500">+${sale.totalProfit.toLocaleString()} ฿</td>
+          <td class="py-3 px-4 text-xs text-slate-500">${sale.soldBy}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderFoodSelect() {
+      const select = document.getElementById('sell-food-select');
+      select.innerHTML = '<option value="">-- เลือกรายการอาหาร --</option>';
+
+      foodData.filter(f => f.qty > 0).forEach(food => {
+        const opt = document.createElement('option');
+        opt.value = food.name;
+        opt.innerText = `${food.name} (คงเหลือ: ${food.qty} | ราคา: ${food.sellingPrice}฿)`;
+        select.appendChild(opt);
+      });
+    }
+
+    function updateFoodPriceHint() {
+      const selectName = document.getElementById('sell-food-select').value;
+      const hint = document.getElementById('food-price-hint');
+      const item = foodData.find(f => f.name === selectName);
+      if (item) {
+        hint.innerText = `ราคาขายหน่วยละ ${item.sellingPrice.toLocaleString()} บาท (ทุน ${item.costPrice.toLocaleString()} บาท)`;
+      } else {
+        hint.innerText = '';
+      }
+    }
+
+    function calculateFoodSummary(sales) {
+      let totalSales = 0;
+      let totalProfit = 0;
+
+      sales.forEach(s => {
+        totalSales += s.totalSales;
+        totalProfit += s.totalProfit;
+      });
+
+      document.getElementById('food-stat-sales').innerText = totalSales.toLocaleString() + ' ฿';
+      document.getElementById('food-stat-profit').innerText = totalProfit.toLocaleString() + ' ฿';
+    }
+
+    // เพิ่มสต็อกอาหาร
+    document.getElementById('add-food-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-add-food');
+      btn.innerText = 'กำลังบันทึก...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'addFoodStock',
+            name: document.getElementById('food-name').value,
+            costPrice: document.getElementById('food-cost').value,
+            sellingPrice: document.getElementById('food-price').value,
+            qty: document.getElementById('food-qty').value,
+            username: currentUser.username,
+            role: currentUser.role
+          })
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+          e.target.reset();
+          loadFoodData();
+        } else {
+          alert(result.message);
+        }
+      } catch(err) {
+        alert('เกิดข้อผิดพลาดในการบันทึกสต็อกอาหาร');
+      } finally {
+        btn.innerText = 'บันทึกสต็อกอาหาร';
+        btn.disabled = false;
+      }
+    });
+
+    // ขายอาหาร
+    document.getElementById('sell-food-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-sell-food');
+      btn.innerText = 'กำลังบันทึก...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'sellFood',
+            name: document.getElementById('sell-food-select').value,
+            qty: document.getElementById('sell-food-qty').value,
+            username: currentUser.username
+          })
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+          e.target.reset();
+          document.getElementById('food-price-hint').innerText = '';
+          loadFoodData();
+        } else {
+          alert(result.message);
+        }
+      } catch(err) {
+        alert('เกิดข้อผิดพลาดในการบันทึกการขายอาหาร');
+      } finally {
+        btn.innerText = 'ยืนยันการขายอาหาร';
+        btn.disabled = false;
+      }
+    });
+
+    async function deleteFoodStock(rowIndex) {
+      if (confirm('คุณต้องการลบรายการอาหารนี้ใช่หรือไม่?')) {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'deleteFoodStock', rowIndex, role: currentUser.role })
+        });
+        loadFoodData();
       }
     }
 

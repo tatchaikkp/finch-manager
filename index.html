@@ -54,6 +54,20 @@
 
     <div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
+      <!-- แถบเลือกเดือนประจำการสรุปยอด -->
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2 font-bold text-slate-700 text-sm md:text-base">
+          <i class="fa-solid fa-calendar-check text-emerald-600 text-lg"></i>
+          <span>เลือกเดือนที่ต้องการดูสรุปยอด:</span>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <input type="month" id="month-filter" onchange="filterMonthlySummary()" class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none w-full sm:w-auto">
+          <button onclick="resetMonthFilter()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2 rounded-xl transition font-medium whitespace-nowrap">
+            ดูทั้งหมด
+          </button>
+        </div>
+      </div>
+
       <!-- แถบสลับเมนู (Tabs) -->
       <div class="flex border-b border-slate-300 space-x-4">
         <button id="tab-birds-btn" onclick="switchTab('birds')" class="pb-3 px-4 font-bold text-emerald-700 border-b-2 border-emerald-600 transition flex items-center gap-2">
@@ -67,27 +81,32 @@
       <!-- TAB 1: ระบบจัดการนก -->
       <div id="tab-birds" class="space-y-6">
         <!-- การ์ดสรุปยอดนก -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase">ยอดขายรวมนก</p>
-              <p class="text-2xl font-extrabold text-emerald-600 mt-1" id="stat-sales">0 ฿</p>
-            </div>
-            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-xl"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span id="bird-stat-title" class="text-xs font-bold uppercase text-slate-500">สรุปยอดรวมขายนก (ทั้งหมด)</span>
           </div>
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase">ต้นทุนรวม (นกขายแล้ว)</p>
-              <p class="text-2xl font-extrabold text-slate-600 mt-1" id="stat-cost">0 ฿</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase">ยอดขายรวมนก</p>
+                <p class="text-2xl font-extrabold text-emerald-600 mt-1" id="stat-sales">0 ฿</p>
+              </div>
+              <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-xl"><i class="fa-solid fa-hand-holding-dollar"></i></div>
             </div>
-            <div class="p-3 bg-slate-100 text-slate-600 rounded-xl text-xl"><i class="fa-solid fa-receipt"></i></div>
-          </div>
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase">กำไรสุทธิการขายนก</p>
-              <p class="text-2xl font-extrabold text-amber-500 mt-1" id="stat-profit">0 ฿</p>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase">ต้นทุนรวม (นกขายแล้ว)</p>
+                <p class="text-2xl font-extrabold text-slate-600 mt-1" id="stat-cost">0 ฿</p>
+              </div>
+              <div class="p-3 bg-slate-100 text-slate-600 rounded-xl text-xl"><i class="fa-solid fa-receipt"></i></div>
             </div>
-            <div class="p-3 bg-amber-50 text-amber-500 rounded-xl text-xl"><i class="fa-solid fa-coins"></i></div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase">กำไรสุทธิการขายนก</p>
+                <p class="text-2xl font-extrabold text-amber-500 mt-1" id="stat-profit">0 ฿</p>
+              </div>
+              <div class="p-3 bg-amber-50 text-amber-500 rounded-xl text-xl"><i class="fa-solid fa-coins"></i></div>
+            </div>
           </div>
         </div>
 
@@ -176,20 +195,25 @@
       <!-- TAB 2: คลังอาหารนก -->
       <div id="tab-food" class="space-y-6 hidden">
         <!-- การ์ดสรุปยอดขายอาหาร -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase">ยอดขายอาหารรวม</p>
-              <p class="text-2xl font-extrabold text-emerald-600 mt-1" id="food-stat-sales">0 ฿</p>
-            </div>
-            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-xl"><i class="fa-solid fa-sack-dollar"></i></div>
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span id="food-stat-title" class="text-xs font-bold uppercase text-slate-500">สรุปยอดขายอาหาร (ทั้งหมด)</span>
           </div>
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase">กำไรสุทธิอาหารนก</p>
-              <p class="text-2xl font-extrabold text-amber-500 mt-1" id="food-stat-profit">0 ฿</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase">ยอดขายอาหารรวม</p>
+                <p class="text-2xl font-extrabold text-emerald-600 mt-1" id="food-stat-sales">0 ฿</p>
+              </div>
+              <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-xl"><i class="fa-solid fa-sack-dollar"></i></div>
             </div>
-            <div class="p-3 bg-amber-50 text-amber-500 rounded-xl text-xl"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase">กำไรสุทธิอาหารนก</p>
+                <p class="text-2xl font-extrabold text-amber-500 mt-1" id="food-stat-profit">0 ฿</p>
+              </div>
+              <div class="p-3 bg-amber-50 text-amber-500 rounded-xl text-xl"><i class="fa-solid fa-chart-line"></i></div>
+            </div>
           </div>
         </div>
 
@@ -318,6 +342,14 @@
     let currentUser = null;
     let birdData = [];
     let foodData = [];
+    let rawSalesData = [];
+
+    // ตั้งค่าตัวกรองเป็นเดือนปัจจุบัน
+    document.addEventListener("DOMContentLoaded", () => {
+      const today = new Date();
+      const monthStr = today.toISOString().substring(0, 7);
+      document.getElementById('month-filter').value = monthStr;
+    });
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -342,7 +374,6 @@
           document.getElementById('user-display').innerText = result.username;
           document.getElementById('role-display').innerText = result.role;
 
-          // เช็คซ่อน/แสดงส่วนเพิ่มข้อมูลเฉพาะ Admin
           const isAdmin = currentUser.role === 'Admin';
           document.getElementById('add-bird-card').style.display = isAdmin ? 'block' : 'none';
           document.getElementById('add-food-card').style.display = isAdmin ? 'block' : 'none';
@@ -367,7 +398,6 @@
       document.getElementById('login-form').reset();
     }
 
-    // ระบบสลับ Tab
     function switchTab(tab) {
       const birdTab = document.getElementById('tab-birds');
       const foodTab = document.getElementById('tab-food');
@@ -385,6 +415,30 @@
         foodBtn.className = "pb-3 px-4 font-bold text-amber-600 border-b-2 border-amber-500 transition flex items-center gap-2";
         birdBtn.className = "pb-3 px-4 font-semibold text-slate-500 hover:text-slate-800 transition flex items-center gap-2";
       }
+    }
+
+    // --- ฟังก์ชันการกรองรายเดือน ---
+    function filterMonthlySummary() {
+      calculateSummary();
+      calculateFoodSummary(rawSalesData);
+    }
+
+    function resetMonthFilter() {
+      document.getElementById('month-filter').value = '';
+      filterMonthlySummary();
+    }
+
+    // Helper แปลงรูปแบบวันที่สากล
+    function matchesSelectedMonth(dateString, selectedMonthStr) {
+      if (!selectedMonthStr) return true; // หากไม่ได้เลือกเดือน ให้แสดงทั้งหมด
+      if (!dateString) return false;
+
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return false;
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      return `${year}-${month}` === selectedMonthStr;
     }
 
     // --- ส่วนของข้อมูลนก ---
@@ -457,12 +511,20 @@
     }
 
     function calculateSummary() {
+      const selectedMonth = document.getElementById('month-filter').value;
+      const titleEl = document.getElementById('bird-stat-title');
+      
+      titleEl.innerText = selectedMonth ? `สรุปยอดรวมขายนก (ประจำเดือน ${selectedMonth})` : `สรุปยอดรวมขายนก (ทั้งหมด)`;
+
       let sales = 0;
       let cost = 0;
 
       birdData.filter(b => b.status === 'ขายแล้ว').forEach(b => {
-        sales += b.sellingPrice;
-        cost += b.costPrice;
+        // กรองตามวันที่ขายออก
+        if (matchesSelectedMonth(b.soldDate || b.timestamp, selectedMonth)) {
+          sales += b.sellingPrice;
+          cost += b.costPrice;
+        }
       });
 
       document.getElementById('stat-sales').innerText = sales.toLocaleString() + ' ฿';
@@ -565,6 +627,7 @@
         const result = await res.json();
         if (result.status === 'success') {
           foodData = result.foods;
+          rawSalesData = result.sales;
           renderFoodTable(result.foods);
           renderFoodSalesTable(result.sales);
           renderFoodSelect();
@@ -652,19 +715,25 @@
     }
 
     function calculateFoodSummary(sales) {
+      const selectedMonth = document.getElementById('month-filter').value;
+      const titleEl = document.getElementById('food-stat-title');
+      
+      titleEl.innerText = selectedMonth ? `สรุปยอดขายอาหาร (ประจำเดือน ${selectedMonth})` : `สรุปยอดขายอาหาร (ทั้งหมด)`;
+
       let totalSales = 0;
       let totalProfit = 0;
 
       sales.forEach(s => {
-        totalSales += s.totalSales;
-        totalProfit += s.totalProfit;
+        if (matchesSelectedMonth(s.timestamp, selectedMonth)) {
+          totalSales += s.totalSales;
+          totalProfit += s.totalProfit;
+        }
       });
 
       document.getElementById('food-stat-sales').innerText = totalSales.toLocaleString() + ' ฿';
       document.getElementById('food-stat-profit').innerText = totalProfit.toLocaleString() + ' ฿';
     }
 
-    // เพิ่มสต็อกอาหาร
     document.getElementById('add-food-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-add-food');
@@ -699,7 +768,6 @@
       }
     });
 
-    // ขายอาหารนก
     document.getElementById('sell-food-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-sell-food');
@@ -733,7 +801,6 @@
       }
     });
 
-    // ลบสินค้าสต็อกอาหาร
     async function deleteFoodStock(rowIndex) {
       if (confirm('คุณต้องการลบรายการอาหารนี้ออกจากสต็อกใช่หรือไม่?')) {
         await fetch(SCRIPT_URL, {

@@ -54,7 +54,7 @@
 
     <div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-      <!-- แถบเลือกโหมดสรุปยอด (รายวัน / รายสัปดาห์ / รายเดือน / ทั้งหมด) -->
+      <!-- แถบเลือกโหมดสรุปยอด -->
       <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-2 font-bold text-slate-700 text-sm md:text-base">
           <i class="fa-solid fa-filter text-emerald-600 text-lg"></i>
@@ -69,13 +69,13 @@
             <option value="all">ทั้งหมด</option>
           </select>
 
-          <!-- ช่องกรอกวันที่/เดือน (เปลี่ยนตามโหมดที่เลือก) -->
+          <!-- ช่องกรอกวันที่/เดือน -->
           <input type="date" id="date-picker-daily" onchange="filterSummary()" class="hidden px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
           <input type="week" id="date-picker-weekly" onchange="filterSummary()" class="hidden px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
           <input type="month" id="date-picker-monthly" onchange="filterSummary()" class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
 
           <button onclick="resetDateFilter()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2 rounded-xl transition font-medium whitespace-nowrap">
-            ล้างค่า
+            แสดงทั้งหมด
           </button>
         </div>
       </div>
@@ -356,19 +356,20 @@
     let rawSalesData = [];
 
     document.addEventListener("DOMContentLoaded", () => {
-      // ตั้งค่าเริ่มต้นของตัวเลือกวันที่
       const today = new Date();
-      const dateStr = today.toISOString().substring(0, 10);
-      const monthStr = today.toISOString().substring(0, 7);
-
-      document.getElementById('date-picker-daily').value = dateStr;
-      document.getElementById('date-picker-monthly').value = monthStr;
       
-      // ตั้งสัปดาห์ปัจจุบัน (Format: YYYY-Www)
-      const year = today.getFullYear();
-      const firstJan = new Date(year, 0, 1);
+      // ฟอร์แมต YYYY-MM-DD
+      const y = today.getFullYear();
+      const m = String(today.getMonth() + 1).padStart(2, '0');
+      const d = String(today.getDate()).padStart(2, '0');
+      
+      document.getElementById('date-picker-daily').value = `${y}-${m}-${d}`;
+      document.getElementById('date-picker-monthly').value = `${y}-${m}`;
+      
+      // ตั้งค่าสัปดาห์ปัจจุบัน
+      const firstJan = new Date(y, 0, 1);
       const weekNum = Math.ceil((((today - firstJan) / 86400000) + firstJan.getDay() + 1) / 7);
-      document.getElementById('date-picker-weekly').value = `${year}-W${String(weekNum).padStart(2, '0')}`;
+      document.getElementById('date-picker-weekly').value = `${y}-W${String(weekNum).padStart(2, '0')}`;
     });
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -472,7 +473,7 @@
       return date.toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' });
     }
 
-    // ตรวจสอบว่าวันที่ตรงกับช่วงเวลาที่เลือกหรือไม่
+    // ฟังก์ชันตรวจสอบและเปรียบเทียบวันที่
     function matchesSelectedFilter(dateString) {
       const mode = document.getElementById('filter-mode').value;
       if (mode === 'all') return true;
@@ -481,30 +482,36 @@
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return false;
 
+      // แปลงวันที่เป้าหมายให้อยู่ในรูปแบบท้องถิ่น YYYY-MM-DD
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      const targetDateStr = `${y}-${m}-${d}`;
+
       if (mode === 'daily') {
         const selectedDaily = document.getElementById('date-picker-daily').value;
         if (!selectedDaily) return true;
-        const targetDate = date.toISOString().substring(0, 10);
-        return targetDate === selectedDaily;
+        return targetDateStr === selectedDaily;
       } 
       else if (mode === 'weekly') {
-        const selectedWeekly = document.getElementById('date-picker-weekly').value; // Format: YYYY-Www
+        const selectedWeekly = document.getElementById('date-picker-weekly').value; // YYYY-Www
         if (!selectedWeekly) return true;
         
-        const [yearStr, weekStr] = selectedWeekly.split('-W');
-        const targetYear = parseInt(yearStr);
-        const targetWeek = parseInt(weekStr);
+        const parts = selectedWeekly.split('-W');
+        if (parts.length !== 2) return true;
+        
+        const targetYear = parseInt(parts[0]);
+        const targetWeek = parseInt(parts[1]);
 
-        const firstJan = new Date(date.getFullYear(), 0, 1);
+        const firstJan = new Date(y, 0, 1);
         const weekNum = Math.ceil((((date - firstJan) / 86400000) + firstJan.getDay() + 1) / 7);
 
-        return date.getFullYear() === targetYear && weekNum === targetWeek;
+        return y === targetYear && weekNum === targetWeek;
       } 
       else if (mode === 'monthly') {
-        const selectedMonthly = document.getElementById('date-picker-monthly').value; // Format: YYYY-MM
+        const selectedMonthly = document.getElementById('date-picker-monthly').value; // YYYY-MM
         if (!selectedMonthly) return true;
-        const targetMonth = date.toISOString().substring(0, 7);
-        return targetMonth === selectedMonthly;
+        return `${y}-${m}` === selectedMonthly;
       }
 
       return true;

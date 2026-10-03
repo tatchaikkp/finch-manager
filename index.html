@@ -176,7 +176,7 @@
         <!-- ตารางแสดงรายการนก -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div class="p-4 border-b flex justify-between items-center bg-slate-50">
-            <h3 class="font-bold text-slate-700 text-sm md:text-base">รายการนกทั้งหมด</h3>
+            <h3 class="font-bold text-slate-700 text-sm md:text-base" id="bird-table-title">รายการนกทั้งหมด</h3>
             <button onclick="loadData()" class="text-xs bg-white hover:bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-lg font-medium transition shadow-sm flex items-center gap-1">
               <i class="fa-solid fa-arrows-rotate"></i> รีเฟรช
             </button>
@@ -358,7 +358,6 @@
     document.addEventListener("DOMContentLoaded", () => {
       const today = new Date();
       
-      // ฟอร์แมต YYYY-MM-DD
       const y = today.getFullYear();
       const m = String(today.getMonth() + 1).padStart(2, '0');
       const d = String(today.getDate()).padStart(2, '0');
@@ -366,7 +365,6 @@
       document.getElementById('date-picker-daily').value = `${y}-${m}-${d}`;
       document.getElementById('date-picker-monthly').value = `${y}-${m}`;
       
-      // ตั้งค่าสัปดาห์ปัจจุบัน
       const firstJan = new Date(y, 0, 1);
       const weekNum = Math.ceil((((today - firstJan) / 86400000) + firstJan.getDay() + 1) / 7);
       document.getElementById('date-picker-weekly').value = `${y}-W${String(weekNum).padStart(2, '0')}`;
@@ -457,6 +455,7 @@
     }
 
     function filterSummary() {
+      renderTable(); // รีเรนเดอร์ตารางนกให้กรองตามช่วงเวลา
       calculateSummary();
       calculateFoodSummary(rawSalesData);
     }
@@ -473,7 +472,6 @@
       return date.toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' });
     }
 
-    // ฟังก์ชันตรวจสอบและเปรียบเทียบวันที่
     function matchesSelectedFilter(dateString) {
       const mode = document.getElementById('filter-mode').value;
       if (mode === 'all') return true;
@@ -482,7 +480,6 @@
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return false;
 
-      // แปลงวันที่เป้าหมายให้อยู่ในรูปแบบท้องถิ่น YYYY-MM-DD
       const y = date.getFullYear();
       const m = String(date.getMonth() + 1).padStart(2, '0');
       const d = String(date.getDate()).padStart(2, '0');
@@ -494,7 +491,7 @@
         return targetDateStr === selectedDaily;
       } 
       else if (mode === 'weekly') {
-        const selectedWeekly = document.getElementById('date-picker-weekly').value; // YYYY-Www
+        const selectedWeekly = document.getElementById('date-picker-weekly').value;
         if (!selectedWeekly) return true;
         
         const parts = selectedWeekly.split('-W');
@@ -509,7 +506,7 @@
         return y === targetYear && weekNum === targetWeek;
       } 
       else if (mode === 'monthly') {
-        const selectedMonthly = document.getElementById('date-picker-monthly').value; // YYYY-MM
+        const selectedMonthly = document.getElementById('date-picker-monthly').value;
         if (!selectedMonthly) return true;
         return `${y}-${m}` === selectedMonthly;
       }
@@ -553,6 +550,9 @@
 
     function renderTable() {
       const tbody = document.getElementById('table-body');
+      const mode = document.getElementById('filter-mode').value;
+      const tableTitle = document.getElementById('bird-table-title');
+      
       tbody.innerHTML = '';
 
       if (birdData.length === 0) {
@@ -560,7 +560,21 @@
         return;
       }
 
-      birdData.forEach(bird => {
+      // กรองข้อมูลเฉพาะตัวที่อยู่ในช่วงเวลาที่เลือก (หากเลือก 'all' จะโชว์ทั้งหมด รวมถึงนกที่ยังไม่ขาย)
+      let filteredBirds = birdData;
+      if (mode !== 'all') {
+        tableTitle.innerText = getFilterTitleText('รายการนกที่ขายได้');
+        filteredBirds = birdData.filter(bird => bird.status === 'ขายแล้ว' && matchesSelectedFilter(bird.soldDate));
+      } else {
+        tableTitle.innerText = 'รายการนกทั้งหมด';
+      }
+
+      if (filteredBirds.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center py-6 text-slate-400">ไม่พบรายการนกตามช่วงเวลาที่เลือก</td></tr>';
+        return;
+      }
+
+      filteredBirds.forEach(bird => {
         const isSold = bird.status === 'ขายแล้ว';
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50 transition';

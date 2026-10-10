@@ -392,8 +392,9 @@
     let foodData = [];
     let rawSalesData = [];
 
-    document.addEventListener("DOMContentLoaded", () => {
+      document.addEventListener("DOMContentLoaded", () => {
       const today = new Date();
+      
       const y = today.getFullYear();
       const m = String(today.getMonth() + 1).padStart(2, '0');
       const d = String(today.getDate()).padStart(2, '0');
@@ -401,8 +402,13 @@
       document.getElementById('date-picker-daily').value = `${y}-${m}-${d}`;
       document.getElementById('date-picker-monthly').value = `${y}-${m}`;
       
-      const firstJan = new Date(y, 0, 1);
-      const weekNum = Math.ceil((((today - firstJan) / 86400000) + firstJan.getDay() + 1) / 7);
+      // คำนวณสัปดาห์ปัจจุบันโดยให้ "วันจันทร์" เป็นวันเริ่มต้นสัปดาห์
+      const dCopy = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+      const dayNum = dCopy.getUTCDay() || 7;
+      dCopy.setUTCDate(dCopy.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(dCopy.getUTCFullYear(), 0, 1));
+      const weekNum = Math.ceil((((dCopy - yearStart) / 86400000) + 1) / 7);
+      
       document.getElementById('date-picker-weekly').value = `${y}-W${String(weekNum).padStart(2, '0')}`;
     });
 
@@ -507,7 +513,7 @@
       return date.toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' });
     }
 
-    function matchesSelectedFilter(dateString) {
+function matchesSelectedFilter(dateString) {
       const mode = document.getElementById('filter-mode').value;
       if (mode === 'all') return true;
       if (!dateString) return false;
@@ -526,7 +532,7 @@
         return targetDateStr === selectedDaily;
       } 
       else if (mode === 'weekly') {
-        const selectedWeekly = document.getElementById('date-picker-weekly').value;
+        const selectedWeekly = document.getElementById('date-picker-weekly').value; // YYYY-Www
         if (!selectedWeekly) return true;
         
         const parts = selectedWeekly.split('-W');
@@ -535,13 +541,18 @@
         const targetYear = parseInt(parts[0]);
         const targetWeek = parseInt(parts[1]);
 
-        const firstJan = new Date(y, 0, 1);
-        const weekNum = Math.ceil((((date - firstJan) / 86400000) + firstJan.getDay() + 1) / 7);
+        // คำนวณสัปดาห์ของวันที่ในรายการโดยยึดวันจันทร์เป็นวันแรกของสัปดาห์
+        const dCopy = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const dayNum = dCopy.getUTCDay() || 7;
+        dCopy.setUTCDate(dCopy.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(dCopy.getUTCFullYear(), 0, 1));
+        const weekNum = Math.ceil((((dCopy - yearStart) / 86400000) + 1) / 7);
+        const calcYear = dCopy.getUTCFullYear();
 
-        return y === targetYear && weekNum === targetWeek;
+        return calcYear === targetYear && weekNum === targetWeek;
       } 
       else if (mode === 'monthly') {
-        const selectedMonthly = document.getElementById('date-picker-monthly').value;
+        const selectedMonthly = document.getElementById('date-picker-monthly').value; // YYYY-MM
         if (!selectedMonthly) return true;
         return `${y}-${m}` === selectedMonthly;
       }

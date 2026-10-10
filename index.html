@@ -61,7 +61,6 @@
           <span>เลือกช่วงเวลาที่ต้องการดูสรุปยอด:</span>
         </div>
         <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          <!-- ตัวเลือกโหมดการกรอง -->
           <select id="filter-mode" onchange="changeFilterMode()" class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium">
             <option value="daily">รายวัน</option>
             <option value="weekly">รายสัปดาห์</option>
@@ -69,10 +68,9 @@
             <option value="all">ทั้งหมด</option>
           </select>
 
-          <!-- ช่องกรอกวันที่/เดือน -->
           <input type="date" id="date-picker-daily" onchange="filterSummary()" class="hidden px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
           <input type="week" id="date-picker-weekly" onchange="filterSummary()" class="hidden px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-          <input type="month" id="date-picker-monthly" onchange="filterSummary()" class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <input type="month" id="date-picker-monthly" onchange="filterSummary()" class="hidden px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
 
           <button onclick="resetDateFilter()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2 rounded-xl transition font-medium whitespace-nowrap">
             แสดงทั้งหมด
@@ -92,7 +90,51 @@
 
       <!-- TAB 1: ระบบจัดการนก -->
       <div id="tab-birds" class="space-y-6">
-        <!-- การ์ดสรุปยอดนก -->
+        
+        <!-- แถบสรุปนกคงเหลือแยกตามชนิดและ Owner -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- การ์ดนก GF คงเหลือ -->
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-emerald-200 bg-gradient-to-br from-emerald-50/40 to-white">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="p-2.5 bg-emerald-600 text-white rounded-xl text-lg"><i class="fa-solid fa-feather"></i></div>
+                <div>
+                  <h4 class="font-bold text-slate-800">นกฟินซ์ (GF) คงเหลือ</h4>
+                  <p class="text-xs text-slate-500">รหัสห่วงขึ้นต้นด้วย GF</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-2xl font-extrabold text-emerald-600" id="gf-total-qty">0</span>
+                <span class="text-xs text-slate-500 block">ตัว</span>
+              </div>
+            </div>
+            <div id="gf-owner-breakdown" class="mt-3 pt-3 border-t border-slate-100 text-xs space-y-1 text-slate-600">
+              <span class="text-slate-400">ยังไม่มีข้อมูล</span>
+            </div>
+          </div>
+
+          <!-- การ์ดนก Zebra คงเหลือ -->
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-blue-200 bg-gradient-to-br from-blue-50/40 to-white">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="p-2.5 bg-blue-600 text-white rounded-xl text-lg"><i class="fa-solid fa-dove"></i></div>
+                <div>
+                  <h4 class="font-bold text-slate-800">นกซิบรา / อื่นๆ (Zebra) คงเหลือ</h4>
+                  <p class="text-xs text-slate-500">รหัสห่วงอื่นๆ (ที่ไม่ใช่ GF)</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-2xl font-extrabold text-blue-600" id="zebra-total-qty">0</span>
+                <span class="text-xs text-slate-500 block">ตัว</span>
+              </div>
+            </div>
+            <div id="zebra-owner-breakdown" class="mt-3 pt-3 border-t border-slate-100 text-xs space-y-1 text-slate-600">
+              <span class="text-slate-400">ยังไม่มีข้อมูล</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- การ์ดสรุปยอดขายนก -->
         <div>
           <div class="flex items-center justify-between mb-2">
             <span id="bird-stat-title" class="text-xs font-bold uppercase text-slate-500">สรุปยอดรวมขายนก</span>
@@ -130,12 +172,12 @@
             </h2>
             <form id="add-form" class="space-y-4">
               <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสห่วง (Ring ID)</label>
-                <input type="text" id="add-ring" required placeholder="เช่น G-2026-01" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสห่วง (Ring ID) <span class="text-slate-400 font-normal">(ขึ้นต้นด้วย GF หรืออื่นๆ)</span></label>
+                <input type="text" id="add-ring" required placeholder="เช่น GF-2026-01 หรือ ZB-01" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">เจ้าของ / ฟาร์มรับมา</label>
-                <input type="text" id="add-owner" required placeholder="เช่น ฟาร์ม A" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <input type="text" id="add-owner" required placeholder="เช่น ฟาร์ม A หรือ คุณสมชาย" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">ราคาทุน (บาท)</label>
@@ -207,7 +249,6 @@
 
       <!-- TAB 2: คลังอาหารนก -->
       <div id="tab-food" class="space-y-6 hidden">
-        <!-- การ์ดสรุปยอดขายอาหาร -->
         <div>
           <div class="flex items-center justify-between mb-2">
             <span id="food-stat-title" class="text-xs font-bold uppercase text-slate-500">สรุปยอดขายอาหาร</span>
@@ -230,7 +271,6 @@
           </div>
         </div>
 
-        <!-- ฟอร์มอาหารนก -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div id="add-food-card" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-3">
@@ -290,7 +330,6 @@
           </div>
         </div>
 
-        <!-- ตารางแสดงสต็อกอาหาร -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div class="p-4 border-b flex justify-between items-center bg-slate-50">
             <h3 class="font-bold text-slate-700 text-sm md:text-base">สต็อกอาหารนกปัจจุบัน</h3>
@@ -317,7 +356,6 @@
           </div>
         </div>
 
-        <!-- ตารางประวัติการขายอาหาร -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div class="p-4 border-b bg-slate-50">
             <h3 class="font-bold text-slate-700 text-sm md:text-base">ประวัติการขายอาหารนก</h3>
@@ -346,7 +384,6 @@
 
     </div>
   </div>
-
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyYpChaKzzV6VOzv1ZVlXhKyWXIqSQ_AKkdt2h5Qnlp4QyWznAKA4Pa4pl6QRXlFv949Q/exec";
 
@@ -357,7 +394,6 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       const today = new Date();
-      
       const y = today.getFullYear();
       const m = String(today.getMonth() + 1).padStart(2, '0');
       const d = String(today.getDate()).padStart(2, '0');
@@ -436,7 +472,6 @@
       }
     }
 
-    // --- ระบบเปลี่ยนโหมดและคำนวณการกรองวัน/สัปดาห์/เดือน ---
     function changeFilterMode() {
       const mode = document.getElementById('filter-mode').value;
       const dailyPicker = document.getElementById('date-picker-daily');
@@ -455,7 +490,7 @@
     }
 
     function filterSummary() {
-      renderTable(); // รีเรนเดอร์ตารางนกให้กรองตามช่วงเวลา
+      renderTable();
       calculateSummary();
       calculateFoodSummary(rawSalesData);
     }
@@ -529,7 +564,6 @@
       return `${prefix} (ทั้งหมด)`;
     }
 
-    // --- ส่วนนก ---
     async function loadData() {
       const tbody = document.getElementById('table-body');
       tbody.innerHTML = '<tr><td colspan="10" class="text-center py-6 text-slate-400">กำลังอัปเดตข้อมูล...</td></tr>';
@@ -542,9 +576,52 @@
           renderTable();
           renderDropdown();
           calculateSummary();
+          calculateRemainingBirds();
         }
       } catch(err) {
         tbody.innerHTML = '<tr><td colspan="10" class="text-center py-6 text-red-400">โหลดข้อมูลไม่สำเร็จ</td></tr>';
+      }
+    }
+
+    function calculateRemainingBirds() {
+      const availableBirds = birdData.filter(b => b.status === 'พร้อมขาย');
+
+      let gfCount = 0;
+      let zebraCount = 0;
+      const gfOwners = {};
+      const zebraOwners = {};
+
+      availableBirds.forEach(bird => {
+        const ringId = String(bird.ringId || '').trim().toUpperCase();
+        const owner = String(bird.owner || 'ไม่ระบุ').trim();
+
+        if (ringId.startsWith('GF')) {
+          gfCount++;
+          gfOwners[owner] = (gfOwners[owner] || 0) + 1;
+        } else {
+          zebraCount++;
+          zebraOwners[owner] = (zebraOwners[owner] || 0) + 1;
+        }
+      });
+
+      document.getElementById('gf-total-qty').innerText = gfCount;
+      const gfContainer = document.getElementById('gf-owner-breakdown');
+      if (Object.keys(gfOwners).length === 0) {
+        gfContainer.innerHTML = '<span class="text-slate-400">ไม่มีนกคงเหลือ</span>';
+      } else {
+        gfContainer.innerHTML = Object.entries(gfOwners)
+          .map(([owner, count]) => `<div class="flex justify-between"><span><i class="fa-solid fa-user-tag text-emerald-500 mr-1"></i> ${owner}</span> <span class="font-bold text-slate-700">${count} ตัว</span></div>`)
+          .join('');
+      }
+
+      document.getElementById('zebra-total-qty').innerText = zebraCount;
+      const zebraContainer = document.getElementById('zebra-owner-breakdown');
+      if (Object.keys(zebraOwners).length === 0) {
+        zebraContainer.innerHTML = '<span class="text-slate-400">ไม่มีนกคงเหลือ</span>';
+      } else {
+        zebraContainer.innerHTML = Object.entries(zebraOwners)
+          .map(([owner, count]) => `<div class="flex justify-between"><span><i class="fa-solid fa-user-tag text-blue-500 mr-1"></i> ${owner}</span> <span class="font-bold text-slate-700">${count} ตัว</span></div>`)
+          .join('');
       }
     }
 
@@ -560,7 +637,6 @@
         return;
       }
 
-      // กรองข้อมูลเฉพาะตัวที่อยู่ในช่วงเวลาที่เลือก (หากเลือก 'all' จะโชว์ทั้งหมด รวมถึงนกที่ยังไม่ขาย)
       let filteredBirds = birdData;
       if (mode !== 'all') {
         tableTitle.innerText = getFilterTitleText('รายการนกที่ขายได้');
@@ -720,7 +796,6 @@
       }
     }
 
-    // --- ส่วนอาหารนก ---
     async function loadFoodData() {
       const tbody = document.getElementById('food-table-body');
       tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400">กำลังอัปเดตสต็อก...</td></tr>';

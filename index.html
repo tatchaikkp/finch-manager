@@ -635,8 +635,8 @@ function matchesSelectedFilter(dateString) {
           .join('');
       }
     }
-
-    function renderTable() {
+    
+function renderTable() {
       const tbody = document.getElementById('table-body');
       const mode = document.getElementById('filter-mode').value;
       const tableTitle = document.getElementById('bird-table-title');
@@ -648,16 +648,20 @@ function matchesSelectedFilter(dateString) {
         return;
       }
 
-      let filteredBirds = birdData;
-      if (mode !== 'all') {
+      let filteredBirds = [];
+
+      if (mode === 'all') {
+        // โหมดทั้งหมด: แสดงเฉพาะนกที่ "พร้อมขาย" เท่านั้น เพื่อไม่ให้ตารางยาวเกินไป
+        tableTitle.innerText = 'รายการนกพร้อมขาย (ทั้งหมด)';
+        filteredBirds = birdData.filter(bird => bird.status === 'พร้อมขาย');
+      } else {
+        // โหมด รายวัน / รายสัปดาห์ / รายเดือน: แสดงนกที่ขายได้ในช่วงเวลานั้นๆ
         tableTitle.innerText = getFilterTitleText('รายการนกที่ขายได้');
         filteredBirds = birdData.filter(bird => bird.status === 'ขายแล้ว' && matchesSelectedFilter(bird.soldDate));
-      } else {
-        tableTitle.innerText = 'รายการนกทั้งหมด';
       }
 
       if (filteredBirds.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center py-6 text-slate-400">ไม่พบรายการนกตามช่วงเวลาที่เลือก</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center py-6 text-slate-400">ไม่พบรายการนกตามเงื่อนไขที่เลือก</td></tr>';
         return;
       }
 
@@ -689,7 +693,7 @@ function matchesSelectedFilter(dateString) {
         `;
         tbody.appendChild(tr);
       });
-    }
+    } 
 
     function renderDropdown() {
       const select = document.getElementById('sell-ring');
